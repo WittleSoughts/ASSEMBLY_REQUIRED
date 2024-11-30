@@ -1,10 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useGLTF, useAnimations } from '@react-three/drei'
 
-export default function Robot(props) {
+export default function Robot({ animationState, ...props }) {
   const group = React.useRef()
   const { nodes, materials, animations } = useGLTF('/models/robot-transformed.glb')
   const { actions } = useAnimations(animations, group)
+
+  useEffect( () => {
+    if ( actions[ animationState ] ) {
+      actions[ animationState ].play()
+    }
+  }, [ animationState ] )
+
   return (
     <group ref={group} {...props} dispose={null}>
       <group name="Scene">

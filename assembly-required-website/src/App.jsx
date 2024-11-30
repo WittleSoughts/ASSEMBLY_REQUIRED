@@ -6,7 +6,7 @@ export default function App() {
     const [ robotAnimationState, setRobotAnimationState ] = useState( null )
 
     const handleExperienceLoaded = () => {
-
+        setRobotAnimationState( 'idle' )
     }
 
     useEffect( () => {
@@ -20,7 +20,10 @@ export default function App() {
                     position: [ 0, 0.6, 2.2 ]
                 }}
             >
-                <Experience handleExperienceLoaded={ handleExperienceLoaded } />
+                <Experience 
+                    handleExperienceLoaded={ handleExperienceLoaded } 
+                    robotAnimationState={ robotAnimationState }
+                />
             </Canvas>
         </div>
     </div>

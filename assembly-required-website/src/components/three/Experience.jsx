@@ -5,7 +5,10 @@ import Containers from './models/Containers.jsx'
 import Robot from './models/Robot.jsx'
 import Scene from './models/Scene.jsx'
 
-export default function Experience({ handleExperienceLoaded }) {
+export default function Experience({ 
+    handleExperienceLoaded,
+    robotAnimationState
+}) {
     useFrame( ( state ) => {
         const camera = state.camera
         camera.lookAt( 0, 0.5, 0 )
@@ -20,7 +23,7 @@ export default function Experience({ handleExperienceLoaded }) {
     }, [] )
 
     return <>
-        <Robot />
+        <Robot animationState={ robotAnimationState } />
         <Containers />
         <Scene />
 
