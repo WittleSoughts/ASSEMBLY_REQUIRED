@@ -1,16 +1,22 @@
-import { useEffect } from 'react'
-import { Environment, useProgress } from '@react-three/drei'
+import { useEffect, useState } from 'react'
+import { Environment, useProgress, OrbitControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
+import * as THREE from 'three'
 import Containers from './models/Containers.jsx'
 import Robot from './models/Robot.jsx'
 import Scene from './models/Scene.jsx'
 
 export default function Experience({ 
+    setWebsiteState,
     handleExperienceLoaded,
-    robotAnimationState
+    robotAnimationState,
+    robotDialogueState
 }) {
+    const [ cameraPosition, setCameraPosition ] = useState( new THREE.Vector3( 0, 0.6, 2.2 ) )
+
     useFrame( ( state ) => {
         const camera = state.camera
+        camera.position.lerp( cameraPosition, 0.1 )
         camera.lookAt( 0, 0.5, 0 )
     } )
 
@@ -18,12 +24,21 @@ export default function Experience({
     useEffect( () => {
         if ( progress === 100 ) {
             console.log( '[+] 3D EXPERIENCE LOADED::' )
-            handleExperienceLoaded()
+            setTimeout(() => {
+                handleExperienceLoaded()
+            }, 1000);
         }
     }, [] )
 
     return <>
-        <Robot animationState={ robotAnimationState } />
+        <OrbitControls />
+
+        <Robot 
+            setWebsiteState={ setWebsiteState }
+            setCameraPosition={ setCameraPosition }
+            animationState={ robotAnimationState } 
+            dialogueState={ robotDialogueState }
+        />
         <Containers />
         <Scene />
 
