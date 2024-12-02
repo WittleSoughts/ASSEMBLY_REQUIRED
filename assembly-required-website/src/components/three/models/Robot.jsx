@@ -190,7 +190,7 @@ export default function Robot({
         <group ref={ robotRef } >
           <skinnedMesh name="body" geometry={nodes.body.geometry} material={nodes.body.material} skeleton={nodes.body.skeleton}>
             <Html
-              position={[ 0, 0.6, 0 ]}
+              position={[ 0, 1.2, 0 ]}
               center
             >
 

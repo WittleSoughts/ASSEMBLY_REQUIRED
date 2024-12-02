@@ -8,7 +8,6 @@ import Scene from './models/Scene.jsx'
 
 export default function Experience({ 
     setWebsiteState,
-    handleExperienceLoaded,
     robotAnimationState,
     robotDialogueState
 }) {
@@ -24,15 +23,10 @@ export default function Experience({
     useEffect( () => {
         if ( progress === 100 ) {
             console.log( '[+] 3D EXPERIENCE LOADED::' )
-            setTimeout(() => {
-                handleExperienceLoaded()
-            }, 1000);
         }
     }, [] )
 
     return <>
-        <OrbitControls />
-
         <Robot 
             setWebsiteState={ setWebsiteState }
             setCameraPosition={ setCameraPosition }
