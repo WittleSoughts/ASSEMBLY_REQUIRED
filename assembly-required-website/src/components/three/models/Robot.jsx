@@ -149,18 +149,11 @@ export default function Robot({
   useEffect( () => {
     if ( actions[ animationState ] ) {
       switch ( animationState ) {
-        case 'intro':
-          actions[ animationState ].reset().fadeIn( 0.5 ).setLoop( THREE.LoopOnce ).play().clampWhenFinished = true
-          setTimeout(() => {
-            setCameraPosition( new THREE.Vector3( 0, 0.4, 1.6 ) )
-          }, 1000)
-          break
-
         case 'idle':
           actions[ animationState ].reset().fadeIn( 0.5 ).setLoop( THREE.LoopRepeat ).play()
           setTimeout(() => {
             setCameraPosition( new THREE.Vector3( 0, 0.4, 1.6 ) )
-          }, 500);
+          }, 3000);
           break
 
         default:

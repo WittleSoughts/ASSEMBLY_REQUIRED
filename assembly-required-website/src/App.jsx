@@ -6,15 +6,15 @@ import LoadingScreen from './components/loading/LoadingScreen.jsx'
 export default function App() {
     const [ isWebsiteLoading, setIsWebsiteLoading ] = useState( true )
     const [ websiteState, setWebsiteState ] = useState( 'intro' )
-    const [ isNewUser, setIsNewUser ] = useState( true )
-    const [ robotAnimationState, setRobotAnimationState ] = useState( null )
+    const [ isNewUser, setIsNewUser ] = useState( false )
+    const [ robotAnimationState, setRobotAnimationState ] = useState( 'idle' )
     const [ robotDialogueState, setRobotDialogueState ] = useState({
         section: '',
         readingType: ''
     })
 
     const handleNewUserIntro = () => {
-        setRobotAnimationState( 'intro' )
+        setRobotAnimationState( 'idle' )
 
         setTimeout(() => {
             setRobotDialogueState({
