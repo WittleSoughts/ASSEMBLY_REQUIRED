@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import Experience from './components/three/Experience.jsx'
 import LoadingScreen from './components/loading/LoadingScreen.jsx'
@@ -12,7 +12,7 @@ export default function App() {
         section: '',
         readingType: ''
     })
-    const [ packageColors, setPackageColors ] = useState([
+    const [ packageColors, setPackageColors ] = useState([ //
         '#4C6053',
         '#79A389',
         '#B0CBBA',
@@ -20,10 +20,67 @@ export default function App() {
         '#C84C4C',
         '#8C1415'
     ])
+    const [ packageContainers, setPackageContainers ] = useState({ //
+        container_1: '#EFA29A',
+        container_2: '#B0CBBA',
+        container_3: '#C84C4C',
+        container_4: '#79A389',
+        container_5: '#8C1415',
+        container_6: '#4C6053'
+    })
+    const [ chosenPackage, setChosenPackage ] = useState( null )
+    const [ chosenContainer, setChosenContainer ] = useState( null ) //
+
+    const isAgentTraining = useRef( false ) //
+
+    const chooseRandomContainer = () => {
+        const keys = Object.keys( packageContainers )
+        const randomKey = Math.floor( Math.random() * keys.length )
+        const pickedKey = keys[ randomKey ]
+
+        const pickedContainer = packageContainers[ pickedKey ]
+
+        setChosenContainer( pickedContainer )
+        return pickedContainer
+    }
+
+    const trainingStep = ( packageColor ) => {
+        const pickedContainer = chooseRandomContainer()
+        console.log( pickedContainer )
+
+        while( isAgentTraining.current === true ) {
+
+        }
+    }
+
+    const resetRobot = ( newAnimationState ) => {
+        setRobotAnimationState( newAnimationState )
+    }
+
+    const createPackage = () => {
+        const randomIndex = Math.floor( Math.random() * packageColors.length )
+        const pickedPackage = packageColors[ randomIndex ]
+
+        setChosenPackage( pickedPackage )
+        return pickedPackage
+    }
+
+    const initializeEnvironment = () => {
+        isAgentTraining.current = true
+
+        const packageColor = createPackage()
+
+        resetRobot( 'handle_package' )
+
+        return packageColor
+    }
+
+    const runTraining = () => {
+        const packageColor = initializeEnvironment()
+        trainingStep( packageColor )
+    }
 
     const handleNewUserIntro = () => {
-        setRobotAnimationState( 'idle' )
-
         setTimeout(() => {
             setRobotDialogueState({
                 section: 'intro',
@@ -33,8 +90,6 @@ export default function App() {
     }
 
     const handleReturningUser = () => {
-        setRobotAnimationState( 'idle' )
-
         setTimeout(() => {
             setRobotDialogueState({
                 section: 'greetings',
@@ -54,8 +109,8 @@ export default function App() {
     }
 
     useEffect( () => {
-        if ( websiteState === 'navigation' ) {
-            console.log( 'navigation component activated' )
+        if ( websiteState === 'training' ) {
+            runTraining()
         }
     }, [ websiteState ] )
 
@@ -90,6 +145,7 @@ export default function App() {
                     setWebsiteState={ setWebsiteState }
                     robotAnimationState={ robotAnimationState }
                     robotDialogueState={ robotDialogueState }
+                    packageContainers={ packageContainers }
                 />
             </Canvas>
         </div>

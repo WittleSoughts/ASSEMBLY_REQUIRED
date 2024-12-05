@@ -10,7 +10,8 @@ import Scene from './models/Scene.jsx'
 export default function Experience({ 
     setWebsiteState,
     robotAnimationState,
-    robotDialogueState
+    robotDialogueState,
+    packageContainers
 }) {
     const [ cameraPosition, setCameraPosition ] = useState( new THREE.Vector3( 0, 0.6, 2.2 ) )
 
@@ -34,7 +35,7 @@ export default function Experience({
             animationState={ robotAnimationState } 
             dialogueState={ robotDialogueState }
         />
-        <Containers />
+        <Containers packageContainers={ packageContainers } />
         <Scene />
 
         {/* <OrbitControls />

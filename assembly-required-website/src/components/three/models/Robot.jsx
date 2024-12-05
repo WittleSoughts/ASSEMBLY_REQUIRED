@@ -14,7 +14,7 @@ export default function Robot({
 }) {
   const [ currentDialogueText, setCurrentDialogueText ] = useState( '' )
   const [ isSpeaking, setIsSpeaking ] = useState( false )
-  const [ isPackageShown, setIsPackageShown ] = useState( false )
+  const [ isPackageShown, setIsPackageShown ] = useState( true )
   const [ isWaitingForUserClick, setIsWaitingForUserClick ] = useState( false )
 
   const group = React.useRef()
@@ -109,7 +109,7 @@ export default function Robot({
         if ( setWebsiteState ) {
           setTimeout( () => {
             setCameraPosition( new THREE.Vector3( 0, 0.6, 2.2 ) )
-            setWebsiteState( 'navigation' )
+            setWebsiteState( 'training' )
           }, 500)
         }
       }
@@ -155,11 +155,16 @@ export default function Robot({
             setCameraPosition( new THREE.Vector3( 0, 0.4, 1.6 ) )
           }, 3000);
           break
+        case 'handle_package':
+          actions[ animationState ].reset().fadeIn( 0.5 ).setLoop( THREE.LoopOnce ).play().clampWhenFinished = true
+          break
 
         default:
           break
       }
     }
+
+    return () => actions[ animationState ]?.fadeOut( 0.5 )
   }, [ animationState ] )
 
   useEffect( () => {
@@ -196,7 +201,7 @@ export default function Robot({
         </group>
 
         <skinnedMesh name="face" geometry={nodes.face.geometry} material={nodes.face.material} skeleton={nodes.face.skeleton} />
-        <skinnedMesh name="package" geometry={nodes['package'].geometry} material={ packageMaterial } skeleton={nodes['package'].skeleton} />
+        <skinnedMesh name="package" geometry={nodes['package'].geometry} material={ nodes['package'].material } skeleton={nodes['package'].skeleton} />
       </group>
     </group>
   )
