@@ -12,6 +12,14 @@ export default function App() {
         section: '',
         readingType: ''
     })
+    const [ packageColors, setPackageColors ] = useState([
+        '#4C6053',
+        '#79A389',
+        '#B0CBBA',
+        '#EFA29A',
+        '#C84C4C',
+        '#8C1415'
+    ])
 
     const handleNewUserIntro = () => {
         setRobotAnimationState( 'idle' )

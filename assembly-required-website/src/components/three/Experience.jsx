@@ -3,6 +3,7 @@ import { Environment, useProgress, OrbitControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import Containers from './models/Containers.jsx'
+import CustomSphere from './models/CustomSphere.jsx'
 import Robot from './models/Robot.jsx'
 import Scene from './models/Scene.jsx'
 
@@ -35,6 +36,9 @@ export default function Experience({
         />
         <Containers />
         <Scene />
+
+        {/* <OrbitControls />
+        <CustomSphere /> */}
 
         <Environment preset='warehouse' environmentIntensity={ 0.8 } />
     </>
