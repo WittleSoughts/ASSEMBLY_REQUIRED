@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Environment, useProgress, OrbitControls } from '@react-three/drei'
+import { Environment, Sparkles, useProgress, OrbitControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import Containers from './models/Containers.jsx'
-import CustomSphere from './models/CustomSphere.jsx'
 import Robot from './models/Robot.jsx'
 import Scene from './models/Scene.jsx'
 
@@ -11,7 +10,9 @@ export default function Experience({
     setWebsiteState,
     robotAnimationState,
     robotDialogueState,
-    packageContainers
+    packageContainers,
+    chosenPackage,
+    chosenContainer
 }) {
     const [ cameraPosition, setCameraPosition ] = useState( new THREE.Vector3( 0, 0.6, 2.2 ) )
 
@@ -29,18 +30,28 @@ export default function Experience({
     }, [] )
 
     return <>
+        <ambientLight color='#e6f7ff' intensity={ 1.5 } />
+        <directionalLight position={[ 0, 2, 2 ]} intensity={ 2.5 } />
+
         <Robot 
             setWebsiteState={ setWebsiteState }
             setCameraPosition={ setCameraPosition }
             animationState={ robotAnimationState } 
             dialogueState={ robotDialogueState }
+            chosenPackage={ chosenPackage }
+            chosenContainer={ chosenContainer }
         />
         <Containers packageContainers={ packageContainers } />
         <Scene />
 
-        {/* <OrbitControls />
-        <CustomSphere /> */}
+        <Sparkles 
+            count={ 120 }
+            scale={[ 8, 2, 2 ]}
+            size={ 3 }
+            speed={ 0.5 }
+            position-y={ 1 }
+        />
 
-        <Environment preset='warehouse' environmentIntensity={ 0.8 } />
+        {/* <Environment preset='warehouse' environmentIntensity={ 0.8 } /> */}
     </>
 }

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Canvas } from '@react-three/fiber'
 import Experience from './components/three/Experience.jsx'
 import LoadingScreen from './components/loading/LoadingScreen.jsx'
+import Navigation from './components/navigation/Navigation.jsx'
 
 export default function App() {
     const [ isWebsiteLoading, setIsWebsiteLoading ] = useState( true )
@@ -20,25 +21,28 @@ export default function App() {
         '#C84C4C',
         '#8C1415'
     ])
-    const [ packageContainers, setPackageContainers ] = useState({ //
-        container_1: '#EFA29A',
-        container_2: '#B0CBBA',
-        container_3: '#C84C4C',
-        container_4: '#79A389',
-        container_5: '#8C1415',
-        container_6: '#4C6053'
-    })
-    const [ chosenPackage, setChosenPackage ] = useState( null )
+    const [ packageContainers, setPackageContainers ] = useState([ //
+        { index: 1, color: '#EFA29A' },
+        { index: 2, color: '#B0CBBA' },
+        { index: 3, color: '#C84C4C' },
+        { index: 4, color: '#79A389' },
+        { index: 5, color: '#8C1415' },
+        { index: 6, color: '#4C6053' }
+    ])
+    const [ chosenPackage, setChosenPackage ] = useState( '#FFFFFF' )
     const [ chosenContainer, setChosenContainer ] = useState( null ) //
 
     const isAgentTraining = useRef( false ) //
 
-    const chooseRandomContainer = () => {
-        const keys = Object.keys( packageContainers )
-        const randomKey = Math.floor( Math.random() * keys.length )
-        const pickedKey = keys[ randomKey ]
+    const executeChosenAction = ( pickedContainer ) => {
+        setTimeout(() => {
+            setRobotAnimationState( `container_${ pickedContainer.index }` )
+        }, 1000);
+    }
 
-        const pickedContainer = packageContainers[ pickedKey ]
+    const chooseRandomContainer = () => {
+        const randomIndex = Math.floor( Math.random() * packageContainers.length )
+        const pickedContainer = packageContainers[ randomIndex ]
 
         setChosenContainer( pickedContainer )
         return pickedContainer
@@ -46,11 +50,9 @@ export default function App() {
 
     const trainingStep = ( packageColor ) => {
         const pickedContainer = chooseRandomContainer()
-        console.log( pickedContainer )
+        console.log( `[*] CHOOSING CONTAINER:: index: ${ pickedContainer.index } | color: ${ pickedContainer.color }` )
 
-        while( isAgentTraining.current === true ) {
-
-        }
+        executeChosenAction( pickedContainer )
     }
 
     const resetRobot = ( newAnimationState ) => {
@@ -69,8 +71,7 @@ export default function App() {
         isAgentTraining.current = true
 
         const packageColor = createPackage()
-
-        resetRobot( 'handle_package' )
+        console.log( `[*] CHOOSING PACKAGE COLOR:: ${ packageColor }` )
 
         return packageColor
     }
@@ -80,37 +81,31 @@ export default function App() {
         trainingStep( packageColor )
     }
 
-    const handleNewUserIntro = () => {
-        setTimeout(() => {
-            setRobotDialogueState({
-                section: 'intro',
-                readingType: 'all'
-            })
-        }, 1500);
-    }
-
-    const handleReturningUser = () => {
-        setTimeout(() => {
-            setRobotDialogueState({
-                section: 'greetings',
-                readingType: 'random'
-            })
-        }, 1000);
-    }
-
     const handleUserIntro = () => {
         setIsWebsiteLoading( false )
 
         if ( isNewUser ) {
-            handleNewUserIntro()
+            setTimeout(() => {
+                setRobotDialogueState({
+                    section: 'intro',
+                    readingType: 'all'
+                })
+            }, 500)
         } else {
-            handleReturningUser()
+            setTimeout(() => {
+                setRobotDialogueState({
+                    section: 'greetings',
+                    readingType: 'random'
+                })
+            }, 500)
         }
     }
 
     useEffect( () => {
-        if ( websiteState === 'training' ) {
-            runTraining()
+        if ( websiteState === 'navigation-home' ) {
+            
+        } else if ( websiteState === 'navigation-feedback' ) {
+
         }
     }, [ websiteState ] )
 
@@ -135,7 +130,18 @@ export default function App() {
             </div>
         }
 
-        <div className='fixed top-0 left-0 w-full h-full z-10'>
+        {
+            websiteState === 'drop_package'
+            &&
+            <div className='fixed top-0 left-0 w-full h-full z-40'>
+                <Navigation
+                    websiteState={ websiteState }
+                    runTraining={ runTraining }
+                />
+            </div>
+        }
+
+        <div className='fixed top-0 left-0 w-full h-full z-30'>
             <Canvas
                 camera={{
                     position: [ 0, 0.6, 2.2 ]
@@ -146,6 +152,8 @@ export default function App() {
                     robotAnimationState={ robotAnimationState }
                     robotDialogueState={ robotDialogueState }
                     packageContainers={ packageContainers }
+                    chosenPackage={ chosenPackage }
+                    chosenContainer={ chosenContainer }
                 />
             </Canvas>
         </div>

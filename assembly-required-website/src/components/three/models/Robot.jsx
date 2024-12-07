@@ -1,15 +1,20 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { useGraph } from '@react-three/fiber'
+import { useGraph, useLoader } from '@react-three/fiber'
 import { Html, useGLTF, useAnimations } from '@react-three/drei'
 import * as THREE from 'three'
 import { SkeletonUtils } from 'three-stdlib'
+import BasicOutline from '../shaders/BasicOutline'
+import BasicToonMaterial from '../shaders/BasicToonMaterial'
 import dialogueScript from '../../../assets/data/dialogueScript'
+import TOON_TONE from '../../../assets/images/fourTone.jpg'
 
 export default function Robot({ 
   setWebsiteState, 
+  setCameraPosition, 
   animationState, 
   dialogueState, 
-  setCameraPosition, 
+  chosenPackage,
+  chosenContainer,
   ...props 
 }) {
   const [ currentDialogueText, setCurrentDialogueText ] = useState( '' )
@@ -24,17 +29,22 @@ export default function Robot({
   const { actions } = useAnimations(animations, group)
 
   const robotRef = useRef( null )
+  const currentRobotAnimation = useRef( null )
   const currentSectionRef = useRef( null )
   const currentReadingTypeRef = useRef( null )
   const currentScriptSectionLineRef = useRef( 0 )
 
-  const [ packageMaterial, scriptData ] = useMemo( () => {
-    const material = nodes['package'].material.clone()
-    material.transparent = true;
-    material.opacity = 0
+  const [ gradientMap, scriptData ] = useMemo( () => {
+    const gradientMap = useLoader( THREE.TextureLoader, TOON_TONE )
 
-    return [ material, dialogueScript ]
+    return [ gradientMap, dialogueScript ]
   } )
+
+  const playRobotAnimation = ( animationName ) => {
+    if ( actions[ animationName ] ) {
+      actions[ animationName ].reset().fadeIn( 0.5 ).setLoop( THREE.LoopOnce ).play().clampWhenFinished = true
+    }
+  }
 
   const parseDisplayChar = ( newChar ) => {
     setCurrentDialogueText( ( prev ) => prev + newChar )
@@ -43,6 +53,8 @@ export default function Robot({
   const parseDialogueLine = ( text, onComplete ) => {
     setCurrentDialogueText( '' )
     let index = 0
+
+    playRobotAnimation( 'talk' )
 
     const parseNextChar = () => {
       if ( index >= text.length ) {
@@ -106,11 +118,11 @@ export default function Robot({
         setIsWaitingForUserClick( false )
         setCurrentDialogueText( '' )
         
+        setCameraPosition( new THREE.Vector3( 0, 0.6, 2.2 ) )
         if ( setWebsiteState ) {
           setTimeout( () => {
-            setCameraPosition( new THREE.Vector3( 0, 0.6, 2.2 ) )
             setWebsiteState( 'training' )
-          }, 500)
+          }, 1000)
         }
       }
 
@@ -121,6 +133,7 @@ export default function Robot({
   const speak = () => {
     if ( !isSpeaking ) {
       setIsSpeaking( true )
+      setCameraPosition( new THREE.Vector3( 0, 0.4, 1.6 ) )
       
       let lineIndex 
       switch ( dialogueState.readingType ) {
@@ -143,25 +156,23 @@ export default function Robot({
   }
 
   useEffect( () => {
-    packageMaterial.opacity = isPackageShown ? 1 : 0
-  }, [ isPackageShown ] )
-
-  useEffect( () => {
     if ( actions[ animationState ] ) {
+      if ( currentRobotAnimation.current ) {
+        currentRobotAnimation.current.stop()
+      }
+
+      const newAnimation = actions[ animationState ]
       switch ( animationState ) {
-        case 'idle':
-          actions[ animationState ].reset().fadeIn( 0.5 ).setLoop( THREE.LoopRepeat ).play()
-          setTimeout(() => {
-            setCameraPosition( new THREE.Vector3( 0, 0.4, 1.6 ) )
-          }, 3000);
-          break
         case 'handle_package':
-          actions[ animationState ].reset().fadeIn( 0.5 ).setLoop( THREE.LoopOnce ).play().clampWhenFinished = true
+          newAnimation.reset().fadeIn( 0.5 ).setLoop( THREE.LoopOnce ).play().clampWhenFinished = true
           break
 
         default:
+          newAnimation.reset().fadeIn( 0.5 ).setLoop( THREE.LoopOnce ).play().clampWhenFinished = true
           break
       }
+
+      currentRobotAnimation.current = newAnimation
     }
 
     return () => actions[ animationState ]?.fadeOut( 0.5 )
@@ -179,14 +190,14 @@ export default function Robot({
   }, [ dialogueState ] )
 
   return (
-    <group ref={group} {...props} dispose={null}>
+    <group ref={ group } { ...props } dispose={ null }>
       <group name="Scene">
         <group name="Armature">
-          <primitive object={nodes.Bone} />
+          <primitive object={ nodes.Bone } />
         </group>
 
         <group ref={ robotRef } >
-          <skinnedMesh name="body" geometry={nodes.body.geometry} material={nodes.body.material} skeleton={nodes.body.skeleton}>
+          <skinnedMesh name="body" geometry={nodes.body.geometry} skeleton={nodes.body.skeleton}>
             <Html
               position={[ 0, 1.2, 0 ]}
               center
@@ -197,11 +208,19 @@ export default function Robot({
               </div>
 
             </Html>
+            <BasicToonMaterial color='#919090' gradientMap={ gradientMap } />
           </skinnedMesh>
+          
         </group>
 
-        <skinnedMesh name="face" geometry={nodes.face.geometry} material={nodes.face.material} skeleton={nodes.face.skeleton} />
-        <skinnedMesh name="package" geometry={nodes['package'].geometry} material={ nodes['package'].material } skeleton={nodes['package'].skeleton} />
+        <skinnedMesh name="face" geometry={nodes.face.geometry} skeleton={nodes.face.skeleton}>
+          <BasicToonMaterial color='#808080' gradientMap={ gradientMap } />
+        </skinnedMesh>
+
+        <skinnedMesh name="package" geometry={nodes['package'].geometry} skeleton={nodes['package'].skeleton}>
+          <meshStandardMaterial color={ chosenPackage } />
+        </skinnedMesh>
+        
       </group>
     </group>
   )
